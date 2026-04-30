@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+export const dynamic = 'force-dynamic';
 import { Pool } from 'pg';
 
 // Kita menggunakan Pool agar koneksi database bisa dipakai ulang secara efisien (Connection Pooling)
