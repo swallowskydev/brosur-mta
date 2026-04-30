@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server';
 import { Pool } from 'pg';
 
 const pool = new Pool({
-  connectionString: 'postgresql://postgres:bismillah@localhost:5432/brosur_mta',
+  connectionString: process.env.DATABASE_URL || 'postgresql://postgres:bismillah@localhost:5432/brosur_mta',
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
 });
 
 export async function GET() {
