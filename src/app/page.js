@@ -11,7 +11,22 @@ export default function Home() {
   const [collection, setCollection] = useState([]);
   const [loadingCollection, setLoadingCollection] = useState(false);
   const [collectionQuery, setCollectionQuery] = useState('');
+  const [suggestedTopics, setSuggestedTopics] = useState([]);
   const inputRef = useRef(null);
+
+  useEffect(() => {
+    const topics = [
+      'Puasa', 'Zakat', 'Haji', 'Ziarah', 'Riba', 'Shalat', 
+      'Aqiqah', 'Qurban', 'Sunnah', 'Bidah', 'Tauhid', 'Akhlaq', 
+      'Iman', 'Taqwa', 'Dosa', 'Taubat', 'Rezeki', 'Hutang', 
+      'Jual Beli', 'Suami', 'Istri', 'Anak', 'Orang Tua', 
+      'Tetangga', 'Marah', 'Sabar', 'Syukur', 'Ikhlash', 
+      'Majelis', 'Ilmu'
+    ];
+    // Shuffle array
+    const shuffled = [...topics].sort(() => 0.5 - Math.random());
+    setSuggestedTopics(shuffled.slice(0, 4));
+  }, []);
 
   const debounceRef = useRef(null);
   const abortControllerRef = useRef(null);
@@ -149,7 +164,7 @@ export default function Home() {
             )}
             {!hasSearched && !showCollection && (
               <div className="mt-6 flex gap-2 justify-center flex-wrap">
-                {['Thaharah', 'Puasa Sunnah', 'Zakat Fitrah', 'Shalat Ied'].map(tag => (
+                {suggestedTopics.map(tag => (
                   <button 
                     key={tag}
                     onClick={() => handleSearch(tag)}
