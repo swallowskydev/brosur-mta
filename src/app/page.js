@@ -10,6 +10,7 @@ export default function Home() {
   const [showCollection, setShowCollection] = useState(false);
   const [collection, setCollection] = useState([]);
   const [loadingCollection, setLoadingCollection] = useState(false);
+  const [collectionQuery, setCollectionQuery] = useState('');
   const inputRef = useRef(null);
 
   const debounceRef = useRef(null);
@@ -26,6 +27,7 @@ export default function Home() {
     setQuery('');
     setHasSearched(false);
     setShowCollection(true);
+    setCollectionQuery('');
     if (collection.length === 0) {
       setLoadingCollection(true);
       try {
@@ -179,8 +181,20 @@ export default function Home() {
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600"></div>
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {collection.map((item, idx) => (
+              <>
+                <div className="mb-6">
+                  <input 
+                    type="text" 
+                    value={collectionQuery}
+                    onChange={(e) => setCollectionQuery(e.target.value)}
+                    placeholder="Cari judul brosur..." 
+                    className="w-full py-3 px-6 bg-white border border-slate-200 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 text-slate-600"
+                  />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {collection
+                    .filter(item => item.title.toLowerCase().includes(collectionQuery.toLowerCase()))
+                    .map((item, idx) => (
                   <a 
                     key={idx}
                     href={`/pdfs/${item.source}`}
@@ -196,8 +210,9 @@ export default function Home() {
                       {item.title}
                     </h3>
                   </a>
-                ))}
-              </div>
+                  ))}
+                </div>
+              </>
             )}
           </div>
         ) : results.length > 0 ? (
