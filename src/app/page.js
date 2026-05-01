@@ -165,23 +165,31 @@ export default function Home() {
 
       {/* Header / Search Section */}
       <div className={`flex flex-col items-center justify-center transition-all duration-700 px-6 ${
-        (hasSearched || showCollection) ? 'py-8 bg-white border-b sticky top-0 z-50 shadow-sm' : 'min-h-[70vh] bg-transparent'
+        (hasSearched || showCollection) ? 'py-6 bg-white/90 backdrop-blur-md border-b border-slate-100 sticky top-0 z-50 shadow-sm' : 'min-h-[75vh] bg-transparent'
       }`}>
-        <div className={`transition-all duration-700 max-w-3xl w-full ${(hasSearched || showCollection) ? 'flex flex-row items-center gap-6' : 'text-center'}`}>
+        <div className={`transition-all duration-700 max-w-3xl w-full ${(hasSearched || showCollection) ? 'flex flex-row items-center gap-6' : 'flex flex-col items-center text-center'}`}>
           
-          <div className={`transition-all duration-700 flex-shrink-0 ${(hasSearched || showCollection) ? 'w-auto' : 'mb-8'}`}>
-            <h1 
+          <div className={`transition-all duration-700 flex-shrink-0 flex ${(hasSearched || showCollection) ? 'flex-row items-center gap-3 w-auto' : 'flex-col items-center mb-10'}`}>
+            <img 
+              src="/icon.png" 
+              alt="Logo MTA" 
               onClick={handleGoHome}
-              className={`font-playfair font-bold text-teal-950 transition-all duration-700 cursor-pointer hover:text-emerald-700 ${
-              (hasSearched || showCollection) ? 'text-2xl whitespace-nowrap' : 'text-5xl md:text-7xl mb-4'
-            }`}>
-              Brosur MTA
-            </h1>
-            {(!hasSearched && !showCollection) && (
-              <p className="text-slate-500 text-lg md:text-xl font-light">
-                Cari dalil dan kajian dalam koleksi brosur resmi.
-              </p>
-            )}
+              className={`cursor-pointer transition-all duration-700 hover:opacity-80 ${(hasSearched || showCollection) ? 'w-8 h-8' : 'w-24 h-24 mb-6 drop-shadow-lg hover:scale-105'}`}
+            />
+            <div>
+              <h1 
+                onClick={handleGoHome}
+                className={`font-playfair font-black transition-all duration-700 cursor-pointer bg-clip-text text-transparent bg-gradient-to-r from-teal-950 via-emerald-800 to-emerald-600 ${
+                (hasSearched || showCollection) ? 'text-2xl whitespace-nowrap' : 'text-5xl md:text-[5.5rem] mb-4 tracking-tight drop-shadow-sm'
+              }`}>
+                Brosur MTA
+              </h1>
+              {(!hasSearched && !showCollection) && (
+                <p className="text-slate-500 text-lg md:text-xl font-light max-w-lg mx-auto leading-relaxed mt-2">
+                  Temukan rujukan dalil, fatwa, dan pembahasan dari <span className="font-semibold text-emerald-700">13.000+</span> arsip resmi Majlis Tafsir Al-Qur'an secara instan.
+                </p>
+              )}
+            </div>
           </div>
 
           <div className={`relative transition-all duration-700 w-full`}>
