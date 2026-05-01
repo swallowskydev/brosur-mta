@@ -39,39 +39,30 @@ export async function GET(request) {
     const { rows } = await pool.query(dbQuery, values);
     
     // Helper function to extract a complete sentence snippet
-    const getSnippet = (fullText, q, maxSentences = 2, maxLength = 500) => {
+    const getSnippet = (fullText, q, paddingBefore = 150, paddingAfter = 350) => {
       if (!fullText) return '';
       const lowerText = fullText.toLowerCase();
       const lowerQuery = q.toLowerCase();
       let index = lowerText.indexOf(lowerQuery);
       
-      if (index === -1) return fullText.substring(0, maxLength) + '...';
+      if (index === -1) return fullText.substring(0, paddingBefore + paddingAfter) + '...';
       
-      let start = index;
-      while (start > 0 && fullText[start] !== '.' && fullText[start] !== '?' && fullText[start] !== '!' && fullText[start] !== '\n') {
+      // Calculate start index and adjust to nearest word boundary
+      let start = Math.max(0, index - paddingBefore);
+      while (start > 0 && !/\s/.test(fullText[start])) {
         start--;
       }
-      if (start > 0) start++; 
+      if (start > 0) start++; // Move past the space
       
-      let end = index + q.length;
-      let sentencesFound = 0;
-      while (end < fullText.length && sentencesFound < maxSentences) {
-        if (fullText[end] === '.' || fullText[end] === '?' || fullText[end] === '!' || fullText[end] === '\n') {
-          sentencesFound++;
-        }
+      // Calculate end index and adjust to nearest word boundary
+      let end = Math.min(fullText.length, index + q.length + paddingAfter);
+      while (end < fullText.length && !/\s/.test(fullText[end])) {
         end++;
       }
       
       let snippet = fullText.substring(start, end).trim();
-      
-      if (snippet.length > maxLength) {
-        let truncateEnd = maxLength;
-        while (truncateEnd > 0 && !/\s/.test(snippet[truncateEnd])) {
-          truncateEnd--;
-        }
-        if (truncateEnd === 0) truncateEnd = maxLength;
-        snippet = snippet.substring(0, truncateEnd) + ' ...';
-      }
+      if (start > 0) snippet = '... ' + snippet;
+      if (end < fullText.length) snippet = snippet + ' ...';
       
       return snippet;
     };
