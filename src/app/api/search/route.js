@@ -20,11 +20,14 @@ export async function GET(request) {
     // 1. Dapatkan semua source yang memiliki text cocok
     // 2. Gabungkan (STRING_AGG) semua text dari source tersebut yang diurutkan berdasarkan part ID
     // Hal ini mengatasi kalimat yang terpotong karena beda halaman.
+    // 1. Bersihkan apostrof dari query untuk pencarian yang lebih toleran
+    const safeQuery = query.replace(/['’`"]/g, '');
+
     const dbQuery = `
       WITH matched_sources AS (
         SELECT DISTINCT source
         FROM brochures
-        WHERE text ILIKE $1
+        WHERE REPLACE(REPLACE(REPLACE(text, '''', ''), '’', ''), '\`', '') ILIKE $1
         LIMIT 50
       )
       SELECT b.source, MAX(b.title) as title, MAX(b.date) as date,
@@ -34,28 +37,31 @@ export async function GET(request) {
       GROUP BY b.source;
     `;
     
-    const values = [`%${query}%`];
+    const values = [`%${safeQuery}%`];
     
     const { rows } = await pool.query(dbQuery, values);
     
     // Helper function to extract a complete sentence snippet
     const getSnippet = (fullText, q, paddingBefore = 150, paddingAfter = 350) => {
       if (!fullText) return '';
-      const lowerText = fullText.toLowerCase();
-      const lowerQuery = q.toLowerCase();
-      let index = lowerText.indexOf(lowerQuery);
+      
+      const cleanQ = q.replace(/['’`]/g, '');
+      const pattern = cleanQ.split('').map(char => char.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join("['’`]*");
+      const regex = new RegExp(pattern, 'gi');
+      const match = regex.exec(fullText);
+      
+      let index = match ? match.index : -1;
+      let matchLength = match ? match[0].length : q.length;
       
       if (index === -1) return fullText.substring(0, paddingBefore + paddingAfter) + '...';
       
-      // Calculate start index and adjust to nearest word boundary
       let start = Math.max(0, index - paddingBefore);
       while (start > 0 && !/\s/.test(fullText[start])) {
         start--;
       }
-      if (start > 0) start++; // Move past the space
+      if (start > 0) start++; 
       
-      // Calculate end index and adjust to nearest word boundary
-      let end = Math.min(fullText.length, index + q.length + paddingAfter);
+      let end = Math.min(fullText.length, index + matchLength + paddingAfter);
       while (end < fullText.length && !/\s/.test(fullText[end])) {
         end++;
       }

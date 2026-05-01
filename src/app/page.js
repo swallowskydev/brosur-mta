@@ -127,12 +127,15 @@ export default function Home() {
 
   const highlightText = (text, highlight) => {
     if (!highlight.trim()) return text;
-    const escapedHighlight = highlight.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const parts = text.split(new RegExp(`(${escapedHighlight})`, 'gi'));
+    const cleanHighlight = highlight.replace(/['’`"]/g, '');
+    const pattern = cleanHighlight.split('').map(char => char.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join("['’`]*");
+    const regex = new RegExp(`(${pattern})`, 'gi');
+    
+    const parts = text.split(regex);
     return (
       <span>
         {parts.map((part, i) => 
-          part.toLowerCase() === highlight.toLowerCase() ? (
+          (i % 2 === 1) ? (
             <mark key={i} className="bg-emerald-100 text-emerald-900 px-0.5 rounded font-medium">{part}</mark>
           ) : (
             part
