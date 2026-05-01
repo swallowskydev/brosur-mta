@@ -110,7 +110,7 @@ export default function Home() {
 
       {/* Header / Search Section */}
       <div className={`flex flex-col items-center justify-center transition-all duration-700 px-6 ${
-        (hasSearched || showCollection) ? 'py-8 bg-white border-b sticky top-0 z-10 shadow-sm' : 'min-h-[70vh] bg-transparent'
+        (hasSearched || showCollection) ? 'py-8 bg-white border-b sticky top-0 z-50 shadow-sm' : 'min-h-[70vh] bg-transparent'
       }`}>
         <div className={`transition-all duration-700 max-w-3xl w-full ${(hasSearched || showCollection) ? 'flex flex-row items-center gap-6' : 'text-center'}`}>
           
