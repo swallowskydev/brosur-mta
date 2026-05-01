@@ -12,6 +12,8 @@ export default function Home() {
   const [loadingCollection, setLoadingCollection] = useState(false);
   const [collectionQuery, setCollectionQuery] = useState('');
   const [suggestedTopics, setSuggestedTopics] = useState([]);
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
+  const [showInstallBtn, setShowInstallBtn] = useState(false);
   const inputRef = useRef(null);
 
   useEffect(() => {
@@ -26,7 +28,35 @@ export default function Home() {
     // Shuffle array
     const shuffled = [...topics].sort(() => 0.5 - Math.random());
     setSuggestedTopics(shuffled.slice(0, 4));
+
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').catch(console.error);
+    }
+
+    // Handle PWA Install Prompt
+    const handleBeforeInstallPrompt = (e) => {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      setShowInstallBtn(true);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    };
   }, []);
+
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') {
+      setShowInstallBtn(false);
+    }
+    setDeferredPrompt(null);
+  };
 
   const debounceRef = useRef(null);
   const abortControllerRef = useRef(null);
@@ -116,7 +146,15 @@ export default function Home() {
     <main className={`min-h-screen bg-[#F8FAFC] text-slate-800 transition-all duration-700 ease-in-out font-inter relative`}>
       
       {/* Top Right Floating Button */}
-      <div className="absolute top-6 right-6 z-20">
+      <div className="absolute top-6 right-6 z-20 flex gap-3">
+        {showInstallBtn && (
+          <button 
+            onClick={handleInstallClick}
+            className="px-4 py-2.5 bg-teal-600 text-white font-bold rounded-full text-sm hover:bg-teal-700 transition-all shadow-md flex items-center gap-2 animate-bounce"
+          >
+            📲 Install App
+          </button>
+        )}
         <button 
           onClick={showCollection ? handleGoHome : handleShowCollection}
           className="px-5 py-2.5 bg-white text-emerald-700 font-bold rounded-full text-sm hover:bg-emerald-50 transition-all shadow-sm border border-slate-200 hover:border-emerald-200 flex items-center gap-2"
