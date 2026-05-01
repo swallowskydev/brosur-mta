@@ -201,7 +201,7 @@ export default function Home() {
               type="text"
               value={query}
               onChange={(e) => handleSearch(e.target.value)}
-              placeholder="Ketik nama surah, dalil, hukum fiqih, atau topik kajian..."
+              placeholder="Ketik kata kunci, dalil, hukum fiqih, atau topik kajian..."
               className={`w-full transition-all duration-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 bg-white border rounded-full shadow-sm hover:shadow-md ${
                 hasSearched ? 'py-3 px-6 border-slate-200' : 'py-5 px-8 text-xl border-slate-200'
               }`}
